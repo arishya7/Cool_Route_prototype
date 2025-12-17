@@ -55,8 +55,8 @@
         }).addTo(map);
 
         // C. Load Your KML File
-        // We look for the file in the SAME folder
-        var kmlLayer = omnivore.kml('latest_route.kml')
+        // We look for the file inside the output folder.
+        var kmlLayer = omnivore.kml('output/latest_route.kml')
             .on('ready', function() {
                 // When loaded, zoom the map to show the whole route
                 map.fitBounds(kmlLayer.getBounds());
