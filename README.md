@@ -18,7 +18,7 @@ CoolRide is an intelligent routing engine that prioritizes **thermal safety** ov
 * **Infrastructure:** NParks Park Connector Network (GeoJSON)
 
 ## 🏃 How to Run
-1.  Open the [Colab Notebook](<YOUR_COLAB_LINK_HERE>).
+1.  Open the [Colab Notebook](https://colab.research.google.com/drive/1rZTwENcLv1PGFwssKeiLiGI_C63VHIdp?usp=sharing).
 2.  The code is configured to pull data directly from this repository's `/data` folder.
 3.  Run all cells to generate the `.kml` route file.
 4.  Upload the KML to Google My Maps for visualization.
