@@ -9,12 +9,13 @@ It uses a "Blue-Green-Grey" infrastructure approach, prioritizing **Park Connect
 
 ---
 
-### 🚀 Key Features (New in V4)
+### 🚀 Key Features (New in V5)
 
+* **💧 Water Body Cooling:** Models evaporative and convective cooling effects from water bodies (reservoirs, lakes) with 100m proximity buffers. Filters significant water features (>0.1 km²) and applies up to 45% thermal cost reduction.
 * **☀️ Dynamic Building Shadows:** Calculates real-time shadows cast by buildings based on the sun's exact position (Elevation & Azimuth) and building height data.
 * **⏰ Time-Aware Routing:** The optimal route changes throughout the day. A path shaded by buildings at 9 AM might be exposed at 12 PM. CoolRide adapts.
 * **🤖 Hybrid AI Engine:** Combines real-time NEA weather data with a custom Linear Regression model (with physics clamping) to forecast heat stress 15 minutes into the future.
-* **🌳 Blue-Green Infrastructure:** Integrates **SGTrees** (Canopy), **Park Connectors** (PCN), and **Water Bodies** (Cooling effect) for holistic thermal scoring.
+* **🌳 Blue-Green Infrastructure:** Integrates **SGTrees** (Canopy), **Park Connectors** (PCN), **Water Bodies** (Cooling effect), and **Building Shadows** for holistic thermal scoring with smart combined discounts (up to 65% reduction for triple coverage).
 * **🛡️ Fail-Safe Protocol:** Includes a "Government Override" mode to force maximum safety routes during national heatwave alerts.
 
 ---
@@ -28,12 +29,14 @@ Cool_Route_prototype/
 ├── data/                        # 💾 Geospatial Data Lake
 │   ├── trees.csv                # Urban Tree Canopy Data (Trees.sg)
 │   ├── ParkConnectorLoop.geojson # NParks Cycling Path Network
-│   └── HawkerCentresGEOJSON.geojson # Shelter Locations
+│   ├── HawkerCentresGEOJSON.geojson # Shelter Locations
+│   └── water.geojson            # Water Bodies (Reservoirs, Lakes)
 │
 ├── output/                      # ☁️ Live Route Deployments
 │   └── latest_route.kml         # The active AI-generated route (Pushed by Python)
 │
-├── Cool_route_v4.ipynb          # 🧠 The Brain: AI & Spatial Analysis Engine
+├── Cool_route_v5.ipynb          # 🧠 The Brain: AI & Spatial Analysis Engine
+├── Cool_route_v4.ipynb          # Previous version (Building Shadows)
 ├── index.html                   # 🗺️ Standalone Leaflet Viewer (For rapid testing)
 └── README.md                    # Project Documentation
 ```
@@ -51,13 +54,15 @@ Cool_Route_prototype/
 * Blue Spaces: OpenStreetMap Water Features
 
 ### 🏃 How to Run (The Engine)
-* Open the Colab Notebook (Cool_route_v4.ipynb).
+* Open the Colab Notebook (Cool_route_v5.ipynb).
 
 * The code is configured to pull data directly from this repository's /data folder.
 
 * Run all cells. The script will:
 
 * * Calculate sun position and building shadows.
+
+* * Load water body data and create cooling proximity buffers.
 
 * * Fetch live weather from the nearest NEA sensor.
 
