@@ -82,7 +82,7 @@ The system operates as a Hybrid Cloud application:
 * * Option B (Manual): Download latest_route.kml and view it in index.html (Leaflet Viewer) or Google My Maps.
 
 ### 👥 Team
-* Swaminaatha Krishnan *
+* Swaminaatha Krishnan
 * Arishya Jindal
 * Luo Ziyi
 * Stefanus Arda 
