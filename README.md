@@ -25,12 +25,6 @@ The repository is organized into two main components: the Geospatial Engine (Pyt
 
 ```text
 Cool_Route_prototype/
-├── CoolRider-1/                 # 🖥️ ASP.NET Core Web Application (The Interface)
-│   ├── Controllers/             # MVC Controllers (Account, Map, Home)
-│   ├── Models/                  # Data Models (User Authentication, DB Context)
-│   ├── Views/                   # Razor Views (Login, Dashboard, Map Display)
-│   └── wwwroot/                 # Static assets (CSS, JS, Images)
-│
 ├── data/                        # 💾 Geospatial Data Lake
 │   ├── trees.csv                # Urban Tree Canopy Data (Trees.sg)
 │   ├── ParkConnectorLoop.geojson # NParks Cycling Path Network
