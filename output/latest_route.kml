@@ -1,20 +1,139 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <kml xmlns="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2">
-    <Document id="522">
-        <Style id="525">
-            <LineStyle id="526">
+    <Document id="26">
+        <Style id="29">
+            <LineStyle id="30">
                 <color>ff008000</color>
                 <colorMode>normal</colorMode>
                 <width>5</width>
             </LineStyle>
         </Style>
-        <Placemark id="524">
+        <Style id="33">
+            <IconStyle id="34">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+                <heading>0</heading>
+                <Icon id="35">
+                    <href>http://googleusercontent.com/maps.google.com/mapfiles/kml/shapes/snowflake_simple.png</href>
+                </Icon>
+            </IconStyle>
+        </Style>
+        <Style id="38">
+            <IconStyle id="39">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+                <heading>0</heading>
+                <Icon id="40">
+                    <href>http://googleusercontent.com/maps.google.com/mapfiles/kml/shapes/snowflake_simple.png</href>
+                </Icon>
+            </IconStyle>
+        </Style>
+        <Style id="43">
+            <IconStyle id="44">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+                <heading>0</heading>
+                <Icon id="45">
+                    <href>http://googleusercontent.com/maps.google.com/mapfiles/kml/shapes/snowflake_simple.png</href>
+                </Icon>
+            </IconStyle>
+        </Style>
+        <Style id="48">
+            <IconStyle id="49">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+                <heading>0</heading>
+                <Icon id="50">
+                    <href>http://googleusercontent.com/maps.google.com/mapfiles/kml/shapes/snowflake_simple.png</href>
+                </Icon>
+            </IconStyle>
+        </Style>
+        <Style id="53">
+            <IconStyle id="54">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+                <heading>0</heading>
+                <Icon id="55">
+                    <href>http://googleusercontent.com/maps.google.com/mapfiles/kml/shapes/snowflake_simple.png</href>
+                </Icon>
+            </IconStyle>
+        </Style>
+        <Style id="58">
+            <IconStyle id="59">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+                <heading>0</heading>
+                <Icon id="60">
+                    <href>http://googleusercontent.com/maps.google.com/mapfiles/kml/shapes/snowflake_simple.png</href>
+                </Icon>
+            </IconStyle>
+        </Style>
+        <Style id="63">
+            <IconStyle id="64">
+                <colorMode>normal</colorMode>
+                <scale>1</scale>
+                <heading>0</heading>
+                <Icon id="65">
+                    <href>http://googleusercontent.com/maps.google.com/mapfiles/kml/shapes/snowflake_simple.png</href>
+                </Icon>
+            </IconStyle>
+        </Style>
+        <Placemark id="28">
             <name>🌟 Recommended Route</name>
-            <description>&lt;b&gt;Smart Choice&lt;/b&gt;&lt;br&gt;The fastest path is also the coolest.&lt;br&gt;No detour needed.&lt;br&gt;&lt;br&gt;Temp: 28.2°C</description>
-            <styleUrl>#525</styleUrl>
-            <LineString id="523">
-                <coordinates>103.7363771,1.4382191,0.0 103.7363744,1.4383611,0.0 103.7363672,1.4383812,0.0 103.7363461,1.4383882,0.0 103.7358008,1.4383948,0.0 103.7358008,1.4383948,0.0 103.7358054,1.4385674,0.0 103.7358054,1.4385674,0.0 103.7354073,1.4386038,0.0 103.735374,1.4386068,0.0 103.7343974,1.4386117,0.0 103.7343974,1.4386117,0.0 103.7338663,1.4386142,0.0 103.7338663,1.4386142,0.0 103.7330748,1.43862,0.0 103.7330748,1.43862,0.0 103.7330097,1.4386209,0.0 103.7330097,1.4386209,0.0 103.7325079,1.4386198,0.0 103.7322687,1.4385941,0.0 103.7322687,1.4385941,0.0 103.731578,1.4383764,0.0 103.7304552,1.438005,0.0 103.7304552,1.438005,0.0 103.7304543,1.4377869,0.0 103.7304543,1.4377869,0.0 103.7304541,1.4377312,0.0 103.7304425,1.4345995,0.0 103.7304425,1.4345995,0.0 103.7304944,1.4345929,0.0 103.73062,1.4345566,0.0 103.7307005,1.4345144,0.0 103.7307779,1.434455,0.0 103.7308512,1.4343728,0.0 103.730897,1.4342977,0.0 103.7309317,1.4342119,0.0 103.7309538,1.4341022,0.0 103.7309544,1.4340572,0.0 103.7309544,1.4340572,0.0 103.730955,1.4340116,0.0 103.7309352,1.4338981,0.0 103.7309058,1.4338188,0.0 103.7308667,1.4337479,0.0 103.7308145,1.4336802,0.0 103.7307403,1.4336118,0.0 103.7306698,1.4335658,0.0 103.7305853,1.4335284,0.0 103.7304937,1.4335053,0.0 103.7304153,1.4334983,0.0 103.7302898,1.4335104,0.0 103.7302259,1.4335281,0.0 103.7301396,1.4335664,0.0 103.730049,1.4336287,0.0 103.7299875,1.4336897,0.0 103.729933,1.4337649,0.0 103.7298935,1.4338445,0.0 103.7298608,1.4339628,0.0 103.729854,1.434049,0.0</coordinates>
+            <description>&lt;b&gt;Smart Choice&lt;/b&gt;&lt;br&gt;The fastest path is also the coolest.&lt;br&gt;No detour needed.&lt;br&gt;&lt;br&gt;Temp: 30.9°C</description>
+            <styleUrl>#29</styleUrl>
+            <LineString id="27">
+                <coordinates>103.8608877,1.2832399,0.0 103.8608341,1.2828336,0.0 103.860818,1.2827485,0.0 103.8607999,1.2827042,0.0 103.8607174,1.2825936,0.0 103.8606463,1.2824991,0.0 103.8606345,1.2824705,0.0 103.8606345,1.2824705,0.0 103.8606565,1.282428,0.0 103.860665,1.2823907,0.0 103.8606726,1.2823679,0.0 103.8606836,1.2823488,0.0 103.8606901,1.2823449,0.0 103.8607013,1.2823382,0.0 103.8608206,1.2822815,0.0 103.8608206,1.2822815,0.0 103.8609166,1.282575,0.0 103.8610688,1.2830525,0.0 103.8611895,1.2834546,0.0 103.8612694,1.2838251,0.0 103.8613385,1.2843618,0.0 103.8614244,1.2851322,0.0 103.8614523,1.2862579,0.0 103.8614708,1.2875907,0.0 103.8614741,1.28783,0.0 103.8614765,1.2880023,0.0 103.8614201,1.2884668,0.0 103.8614049,1.2886734,0.0 103.8613532,1.2901215,0.0 103.8613273,1.2907029,0.0 103.8613159,1.2911738,0.0 103.8612866,1.2921261,0.0 103.8613135,1.2925475,0.0 103.8612866,1.292907,0.0 103.8612304,1.2932983,0.0 103.8611722,1.2936402,0.0 103.8611283,1.2938659,0.0 103.8610726,1.2941833,0.0 103.8609914,1.2945465,0.0 103.860897,1.294961,0.0 103.8607057,1.2953636,0.0 103.860622,1.2955227,0.0 103.8604265,1.2957609,0.0 103.8604265,1.2957609,0.0 103.8601241,1.296156,0.0 103.8598243,1.2964854,0.0 103.8596328,1.2966532,0.0 103.8596328,1.2966532,0.0 103.8591376,1.2971174,0.0 103.8586122,1.2976373,0.0 103.8585985,1.2976519,0.0 103.8583693,1.2978965,0.0 103.858052,1.2982279,0.0 103.8580002,1.298285,0.0 103.8580002,1.298285,0.0 103.8579196,1.2982066,0.0 103.8576535,1.2979478,0.0 103.8575114,1.2978163,0.0 103.8572757,1.2975721,0.0 103.8572592,1.2975539,0.0 103.8572592,1.2975539,0.0 103.8569246,1.2971915,0.0 103.8566813,1.2968702,0.0 103.8564852,1.2966114,0.0 103.8564591,1.2965736,0.0 103.8563854,1.296467,0.0 103.8563854,1.296467,0.0 103.8562969,1.2963356,0.0 103.8562969,1.2963356,0.0 103.8562537,1.296267,0.0 103.8561527,1.2961365,0.0 103.8561527,1.2961365,0.0 103.8558979,1.2957413,0.0 103.8557186,1.2954802,0.0 103.8557186,1.2954802,0.0 103.855523,1.2951401,0.0 103.855523,1.2951401,0.0 103.855157,1.2945531,0.0 103.855157,1.2945531,0.0 103.8549499,1.2942132,0.0 103.8548149,1.2940008,0.0 103.8548018,1.2939705,0.0 103.8547942,1.2939429,0.0 103.8547894,1.2939133,0.0 103.8547873,1.2938795,0.0 103.8547866,1.2938316,0.0 103.8547866,1.2938316,0.0 103.8553292,1.2934669,0.0</coordinates>
             </LineString>
+        </Placemark>
+        <Placemark id="32">
+            <name>🧊 Amoy Street Food Centre (Telok Ayer Food Centre)</name>
+            <styleUrl>#33</styleUrl>
+            <Point id="31">
+                <coordinates>103.84661927383159,1.2792312094873002,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="37">
+            <name>🧊 Tanjong Pagar Plaza Blk 6 (Blk 6 Tanjong Pagar Plaza Market and Food Centre)</name>
+            <styleUrl>#38</styleUrl>
+            <Point id="36">
+                <coordinates>103.8431616772891,1.276613670144106,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="42">
+            <name>🧊 Upper Cross Street Blk 531A (Hong Lim Food Centre and Market)</name>
+            <styleUrl>#43</styleUrl>
+            <Point id="41">
+                <coordinates>103.84582428335005,1.2852950787883,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="47">
+            <name>🧊 Maxwell Food Centre (Kim Hua Market)</name>
+            <styleUrl>#48</styleUrl>
+            <Point id="46">
+                <coordinates>103.844747227493,1.2803314273259558,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="52">
+            <name>🧊 Queen Street Blk 270 (Albert Centre)</name>
+            <styleUrl>#53</styleUrl>
+            <Point id="51">
+                <coordinates>103.85411577872539,1.3011020159948925,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="57">
+            <name>🧊 Market Street Hawker Centre</name>
+            <styleUrl>#58</styleUrl>
+            <Point id="56">
+                <coordinates>103.85000596089957,1.2839000647082708,0.0</coordinates>
+            </Point>
+        </Placemark>
+        <Placemark id="62">
+            <name>🧊 Smith Street Blk 335 (Chinatown Complex Market)</name>
+            <styleUrl>#63</styleUrl>
+            <Point id="61">
+                <coordinates>103.84323851850745,1.2822749608841026,0.0</coordinates>
+            </Point>
         </Placemark>
     </Document>
 </kml>

@@ -35,7 +35,8 @@ Cool_Route_prototype/
 ├── output/                      # ☁️ Live Route Deployments
 │   └── latest_route.kml         # The active AI-generated route (Pushed by Python)
 │
-├── Cool_route_v5.ipynb          # 🧠 The Brain: AI & Spatial Analysis Engine
+├── Cool_route_v5.2.ipynb        # 🧠 LATEST: User Input Version
+├── Cool_route_v5.ipynb          # 🧠 AI & Spatial Analysis Engine (Pre-configured)
 ├── Cool_route_v4.ipynb          # Previous version (Building Shadows)
 ├── index.html                   # 🗺️ Standalone Leaflet Viewer (For rapid testing)
 └── README.md                    # Project Documentation
@@ -54,23 +55,34 @@ Cool_Route_prototype/
 * Blue Spaces: OpenStreetMap Water Features
 
 ### 🏃 How to Run (The Engine)
-* Open the Colab Notebook (Cool_route_v5.ipynb).
 
-* The code is configured to pull data directly from this repository's /data folder.
+#### **Option 1: Interactive User Input (Recommended) - V5.2**
+* Open the Colab Notebook (`Cool_route_v5.2.ipynb`).
+
+* **User-Friendly Input:** The notebook will prompt you to enter:
+  * Starting point (place name like "Redhill MRT" OR coordinates)
+  * Ending point (place name like "Marina Bay Sands" OR coordinates)
+  * Departure time (optional - defaults to current time if not provided)
+
+* The code is configured to pull data directly from this repository's `/data` folder.
 
 * Run all cells. The script will:
+  * Geocode your place names automatically (if provided)
+  * Calculate sun position and building shadows
+  * Apply time-dependent shade decay (morning/evening vs. midday)
+  * Load water body data and create cooling proximity buffers
+  * Fetch live weather from the nearest NEA sensor
+  * Generate a `.kml` route file in the `output/` folder
 
-* * Calculate sun position and building shadows.
+#### **Option 2: Pre-configured Routes - V5**
+* Open the Colab Notebook (`Cool_route_v5.ipynb`).
 
-* * Load water body data and create cooling proximity buffers.
+* Edit the hardcoded coordinates in Module 2 (Configuration) to set your route.
 
-* * Fetch live weather from the nearest NEA sensor.
+* Run all cells for automated route generation without user prompts.
 
-* * Generate a .kml route file in the ```output/``` folder.
-
-* View the Route:
-
-* * Download latest_route.kml and view it in index.html (Leaflet Viewer) or Google My Maps.
+#### **View the Route:**
+* Download `latest_route.kml` and view it in `index.html` (Leaflet Viewer) or Google My Maps.
 
 ### 👥 Team
 * Swaminaatha Krishnan
