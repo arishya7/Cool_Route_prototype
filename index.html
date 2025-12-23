@@ -3,112 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CoolRide Command Center</title>
-    
+    <title>CoolRide V7: Live Demo</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <style>
-        body { margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
-        
-        /* Layout */
+        body { margin: 0; font-family: 'Inter', sans-serif; }
         #map { position: absolute; top: 0; bottom: 0; width: 100%; z-index: 1; }
         
-        /* Floating Dashboard Panel */
         #panel {
-            position: absolute;
-            top: 20px; left: 20px;
-            width: 320px;
+            position: absolute; top: 20px; left: 20px; width: 340px;
             background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            padding: 20px; border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
             z-index: 1000;
-            border: 1px solid rgba(0,0,0,0.1);
         }
         
-        h1 { margin: 0 0 5px; font-size: 24px; color: #1a1a1a; font-weight: 600; }
-        p { margin: 0 0 15px; font-size: 14px; color: #666; }
+        input, button { width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 6px; border: 1px solid #ddd; box-sizing: border-box; }
+        button { background: #2563eb; color: white; border: none; font-weight: 600; cursor: pointer; }
+        button:hover { background: #1d4ed8; }
         
-        /* Status Indicators */
-        .status-box {
-            background: #f4f6f8;
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-        }
-        .status-row { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 5px; }
-        .label { color: #555; }
-        .value { font-weight: 600; color: #000; }
-        
-        /* Legend */
-        .legend-item { display: flex; align-items: center; margin: 8px 0; font-size: 14px; }
-        .dot { width: 12px; height: 12px; border-radius: 50%; margin-right: 10px; }
-        
-        /* Refresh Button */
-        .btn {
-            background: #2563eb;
-            color: white;
-            border: none;
-            width: 100%;
-            padding: 12px;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        .btn:hover { background: #1d4ed8; }
-        .btn:active { transform: scale(0.98); }
-        
-        /* Loading Spinner */
-        .loader {
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #2563eb;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            animation: spin 1s linear infinite;
-            display: inline-block;
-            margin-right: 10px;
-            display: none; /* Hidden by default */
-        }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        
-        .footer { margin-top: 15px; font-size: 11px; color: #999; text-align: center; }
+        .api-box { font-size: 11px; color: #666; margin-bottom: 10px; }
+        .status { margin-top: 10px; font-size: 13px; font-weight: 600; text-align: center; }
     </style>
 </head>
 <body>
 
     <div id="panel">
-        <h1>🚴 CoolRide Live</h1>
-        <p>Thermal Comfort Routing Engine (V5.3)</p>
+        <h2 style="margin-top:0;">🚴 CoolRide V7</h2>
         
-        <div class="status-box">
-            <div class="status-row">
-                <span class="label">Backend Status:</span>
-                <span class="value" id="status-text">Ready</span>
-            </div>
-            <div class="status-row">
-                <span class="label">Last Sync:</span>
-                <span class="value" id="last-sync">-</span>
-            </div>
+        <div class="api-box">
+            <label>🔌 Server URL (From Colab):</label>
+            <input type="text" id="apiUrl" placeholder="Paste Ngrok URL here (e.g. https://xyz.ngrok-free.app)">
         </div>
+        <hr>
+
+        <label>📍 Start Point</label>
+        <input type="text" id="start" placeholder="e.g. Bedok Reservoir">
         
-        <div class="legend-item">
-            <span class="dot" style="background: #ef4444;"></span> Fastest Route (Hot)
-        </div>
-        <div class="legend-item">
-            <span class="dot" style="background: #22c55e;"></span> Cool Route (Shaded)
-        </div>
+        <label>🎯 Destination</label>
+        <input type="text" id="end" placeholder="e.g. Bedok Mall">
         
-        <button class="btn" onclick="fetchRoute()">
-            <span class="loader" id="spinner"></span> <span id="btn-text">Check for Updates</span>
-        </button>
+        <label>⏰ Departure Time</label>
+        <input type="time" id="time" value="14:00">
         
-        <div class="footer">
-            Powered by NEA Weather & OpenStreetMap
-        </div>
+        <button onclick="calculateRoute()">🚀 Find Cool Route</button>
+        
+        <div class="status" id="status">Ready to Route</div>
     </div>
 
     <div id="map"></div>
@@ -117,88 +57,69 @@
     <script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-omnivore/v0.3.1/leaflet-omnivore.min.js'></script>
 
     <script>
-        // 1. Initialize Map
-        // Default View: Singapore Center
-        var map = L.map('map').setView([1.3521, 103.8198], 12); 
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-            attribution: '© OpenStreetMap, © CartoDB'
-        }).addTo(map);
-
+        var map = L.map('map').setView([1.3521, 103.8198], 12);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { attribution: 'OSM' }).addTo(map);
         var routeLayer = null;
 
-        // 2. Custom Style Function
-        var customStyle = L.geoJson(null, {
-            style: function(feature) {
-                var name = feature.properties.name || "";
-                // Red for Hot/Fastest
-                if (name.includes("Fastest") || name.includes("Standard")) {
-                    return { color: "#ef4444", weight: 5, opacity: 0.8 };
-                }
-                // Green for Cool/Recommended
-                if (name.includes("Cool") || name.includes("Recommended") || name.includes("Optimal")) {
-                    return { color: "#22c55e", weight: 6, opacity: 0.9 };
-                }
-                return { color: "#3b82f6", weight: 3 }; // Fallback Blue
-            }
-        });
-
-        // 3. Fetch Logic
-        function fetchRoute() {
-            var btnText = document.getElementById("btn-text");
-            var spinner = document.getElementById("spinner");
-            var statusText = document.getElementById("status-text");
-            var syncText = document.getElementById("last-sync");
-
-            // UI Loading State
-            btnText.innerText = "Syncing with Cloud...";
-            spinner.style.display = "inline-block";
-            statusText.innerText = "Fetching...";
-            statusText.style.color = "#d97706"; // Orange
-
-            // Clear old layer
+        async function calculateRoute() {
+            var url = document.getElementById("apiUrl").value;
+            if (!url) return alert("⚠️ Please paste the Server URL from the Python Notebook!");
+            
+            // UI Loading
+            document.getElementById("status").innerText = "⏳ Connecting to AI Cloud...";
+            document.getElementById("status").style.color = "orange";
+            
+            // Remove old layer
             if (routeLayer) map.removeLayer(routeLayer);
 
-            // Construct URL with Cache Buster (Essential!)
-            var rawUrl = 'https://raw.githubusercontent.com/swaminaathakrishnan/Cool_Route_prototype/master/output/latest_route.kml';
-            var cacheBuster = '?t=' + new Date().getTime();
+            // Prepare Payload
+            var payload = {
+                start: document.getElementById("start").value,
+                end: document.getElementById("end").value,
+                time: document.getElementById("time").value
+            };
 
-            // Fetch KML
-            routeLayer = omnivore.kml(rawUrl + cacheBuster, null, customStyle)
-                .on('ready', function() {
-                    // Success
-                    map.fitBounds(routeLayer.getBounds());
+            try {
+                // Send to Python
+                let response = await fetch(url + "/calculate_route", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                });
+
+                let result = await response.json();
+
+                if (result.status === "success") {
+                    // Parse KML String directly
+                    var kmlString = result.kml_data;
                     
-                    // Bind Popups
-                    this.eachLayer(function(layer) {
-                        if (layer.feature && layer.feature.properties.description) {
-                            layer.bindPopup(layer.feature.properties.description);
+                    // Use a Blob to make Omnivore read the string
+                    var kmlBlob = new Blob([kmlString], {type: "text/xml"});
+                    var kmlUrl = URL.createObjectURL(kmlBlob);
+
+                    // Custom Style
+                    var customStyle = L.geoJson(null, {
+                        style: function(f) {
+                            return { color: f.properties.name.includes("Cool") ? "#22c55e" : "#ef4444", weight: 5 };
                         }
                     });
 
-                    // UI Success State
-                    btnText.innerText = "Check for Updates";
-                    spinner.style.display = "none";
-                    statusText.innerText = "Live";
-                    statusText.style.color = "#22c55e"; // Green
-                    
-                    var now = new Date();
-                    syncText.innerText = now.toLocaleTimeString();
-                })
-                .on('error', function(e) {
-                    // Error
-                    console.error("KML Load Error", e);
-                    btnText.innerText = "Retry Sync";
-                    spinner.style.display = "none";
-                    statusText.innerText = "Offline / No Data";
-                    statusText.style.color = "#ef4444"; // Red
-                    alert("⚠️ Could not find a route file. Did you run the Python backend?");
-                })
-                .addTo(map);
+                    routeLayer = omnivore.kml(kmlUrl, null, customStyle)
+                        .on('ready', function() {
+                            map.fitBounds(routeLayer.getBounds());
+                            document.getElementById("status").innerText = "✅ Route Calculated!";
+                            document.getElementById("status").style.color = "green";
+                        })
+                        .addTo(map);
+                } else {
+                    throw new Error(result.message);
+                }
+            } catch (error) {
+                console.error(error);
+                document.getElementById("status").innerText = "❌ Error: " + error.message;
+                document.getElementById("status").style.color = "red";
+            }
         }
-
-        // Auto-load on open
-        fetchRoute();
-
     </script>
 </body>
 </html>
