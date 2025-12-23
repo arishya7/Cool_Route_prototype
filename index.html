@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CoolRide V9.0: Live Now</title>
+    <title>CoolRide V9.1: Live Now</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@500&family=Noto+Sans+Tamil:wght@500&display=swap" rel="stylesheet">
@@ -20,12 +20,37 @@
             z-index: 1000; border: 1px solid rgba(0,0,0,0.05);
             display: flex; flex-direction: column; gap: 12px;
             max-height: 90vh; overflow-y: auto;
-            transition: all 0.3s ease;
+            transition: opacity 0.2s ease, transform 0.2s ease;
         }
 
-        /* TYPOGRAPHY */
+        /* FLOATING OPEN BUTTON (Hidden by default) */
+        #openBtn {
+            position: absolute; top: 20px; left: 20px;
+            background: white; color: #334155;
+            padding: 12px; border-radius: 12px;
+            font-weight: 700; font-size: 20px; line-height: 1;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 999; border: 1px solid #e2e8f0;
+            cursor: pointer; display: none; 
+            transition: transform 0.1s;
+        }
+        #openBtn:hover { transform: scale(1.05); color: #2563eb; }
+
+        /* HEADER CONTROLS */
+        .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+        .header-controls { display: flex; gap: 8px; align-items: center; }
+        
+        /* Close Button */
+        .close-btn { 
+            cursor: pointer; color: #94a3b8; font-weight: bold; font-size: 18px; 
+            padding: 4px 8px; border-radius: 6px; transition: background 0.2s;
+        }
+        .close-btn:hover { background: #f1f5f9; color: #ef4444; }
+
+        /* TYPOGRAPHY & INPUTS */
         label { font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: -8px;}
         input, select { width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px; box-sizing: border-box; font-family: 'Inter'; font-size: 14px;}
+        .lang-select { width: auto; padding: 4px 8px; font-size: 11px; border-radius: 6px; background: #f1f5f9; border: none; cursor: pointer;}
         
         /* BUTTONS */
         .primary-btn { 
@@ -35,9 +60,8 @@
             box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
         }
         .primary-btn:hover { transform: translateY(-1px); }
-        .primary-btn:active { transform: translateY(0); }
 
-        /* DOWNLOAD BUTTON (FLOATING) */
+        /* DOWNLOAD BUTTON */
         #downloadBtn {
             position: absolute; bottom: 30px; right: 30px;
             background: white; color: #334155;
@@ -45,27 +69,18 @@
             font-weight: 600; font-size: 13px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.15);
             z-index: 1000; border: 1px solid #e2e8f0;
-            display: none; cursor: pointer;
-            align-items: center; gap: 8px;
+            display: none; cursor: pointer; align-items: center; gap: 8px;
             transition: all 0.2s;
         }
-        #downloadBtn:hover { transform: translateY(-2px); box-shadow: 0 6px 25px rgba(0,0,0,0.2); }
+        #downloadBtn:hover { transform: translateY(-2px); }
 
-        /* HEADER & LANG */
-        .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
-        .lang-select { width: auto; padding: 4px 8px; font-size: 11px; border-radius: 6px; background: #f1f5f9; border: none; cursor: pointer;}
-
-        /* CALLOUT / ONBOARDING */
+        /* CALLOUT & STOP BOX */
         .callout {
             background: #eff6ff; border-left: 4px solid #3b82f6;
             padding: 10px; border-radius: 4px; font-size: 12px;
             color: #1e40af; margin-bottom: 5px;
             display: flex; justify-content: space-between; align-items: flex-start;
         }
-        .callout-close { cursor: pointer; opacity: 0.5; font-size: 14px; margin-left: 8px; }
-        .callout-close:hover { opacity: 1; }
-
-        /* STOP BOX */
         .stop-container { display: none; background: #fff1f2; padding: 10px; border-radius: 8px; border: 1px dashed #f43f5e; }
         .stop-label { font-size: 11px; color: #be123c; font-weight: 700; display: flex; justify-content: space-between; }
         .remove-stop { cursor: pointer; text-decoration: underline; }
@@ -85,19 +100,25 @@
 </head>
 <body>
 
+    <button id="openBtn" onclick="togglePanel()" title="Open Controls">☰</button>
+
     <div id="panel">
         <div class="header-row">
-            <h2 style="margin:0;">🚴 CoolRide <span style="font-size:12px;color:white;background:#22c55e;padding:2px 6px;border-radius:10px;">V9.0</span></h2>
-            <select class="lang-select" onchange="changeLanguage(this.value)">
-                <option value="en">English</option>
-                <option value="zh">中文</option>
-                <option value="ta">தமிழ்</option>
-            </select>
+            <h2 style="margin:0;">🚴 CoolRide <span style="font-size:12px;color:white;background:#22c55e;padding:2px 6px;border-radius:10px;">V9.1</span></h2>
+            
+            <div class="header-controls">
+                <select class="lang-select" onchange="changeLanguage(this.value)">
+                    <option value="en">English</option>
+                    <option value="zh">中文</option>
+                    <option value="ta">தமிழ்</option>
+                </select>
+                <div class="close-btn" onclick="togglePanel()">✕</div>
+            </div>
         </div>
 
         <div id="onboarding" class="callout">
-            <span data-lang="welcome_msg">👋 <b>New to CoolRide?</b> Try searching "Bedok Reservoir" to see our water-cooling AI in action!</span>
-            <span class="callout-close" onclick="document.getElementById('onboarding').style.display='none'">✕</span>
+            <span data-lang="welcome_msg">👋 <b>New?</b> Try searching "Bedok Reservoir" to see AI cooling!</span>
+            <span style="cursor:pointer;opacity:0.5;margin-left:8px;" onclick="document.getElementById('onboarding').style.display='none'">✕</span>
         </div>
         
         <input type="text" id="apiUrl" placeholder="🔌 Paste Ngrok URL Here" style="font-family:monospace; font-size:11px; background:#f8fafc;">
@@ -149,76 +170,62 @@
         var map = L.map('map', {zoomControl: false}).setView([1.3521, 103.94], 14);
         L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { attribution: 'OSM' }).addTo(map);
         var routeLayer = null;
-
-        // --- GLOBAL VARIABLES ---
         var baseRouteData = null; 
-        var lastKmlData = null; // Store KML for download
+        var lastKmlData = null; 
 
-        // --- TRANSLATION DICTIONARY ---
+        // --- UI TOGGLE LOGIC ---
+        function togglePanel() {
+            var panel = document.getElementById("panel");
+            var openBtn = document.getElementById("openBtn");
+            if (panel.style.display === "none") {
+                panel.style.display = "flex";
+                openBtn.style.display = "none";
+            } else {
+                panel.style.display = "none";
+                openBtn.style.display = "block";
+            }
+        }
+
+        // --- TRANSLATION LOGIC ---
         const translations = {
             en: {
-                start: "📍 Start Point",
-                dest: "🎯 Destination",
-                time: "⏰ Departure Time",
-                btn_find: "🚀 Find Cool Route",
-                btn_download: "Download KML",
-                status_ready: "Ready to connect...",
-                status_compute: "⏳ Connecting to AI Brain...",
-                ai_title: "🤖 AI THERMAL FORECAST",
-                ai_current: "Current Heat Stress",
-                ai_predict: "Predicted (1h)",
-                added_stop: "🛑 ADDED STOP",
-                welcome_msg: "👋 <b>New to CoolRide?</b> Try searching 'Bedok Reservoir' to see our water-cooling AI in action!"
+                start: "📍 Start Point", dest: "🎯 Destination", time: "⏰ Departure Time",
+                btn_find: "🚀 Find Cool Route", btn_download: "Download KML",
+                status_ready: "Ready to connect...", status_compute: "⏳ Connecting to AI Brain...",
+                ai_title: "🤖 AI THERMAL FORECAST", ai_current: "Current Heat Stress", ai_predict: "Predicted (1h)",
+                added_stop: "🛑 ADDED STOP", welcome_msg: "👋 <b>New?</b> Try searching 'Bedok Reservoir' to see AI cooling!"
             },
             zh: {
-                start: "📍 起点",
-                dest: "🎯 终点",
-                time: "⏰ 出发时间",
-                btn_find: "🚀 寻找清凉路线",
-                btn_download: "下载 KML 文件",
-                status_ready: "准备连接...",
-                status_compute: "⏳ 正在连接 AI 大脑...",
-                ai_title: "🤖 AI 热量预测",
-                ai_current: "当前热应力",
-                ai_predict: "预测 (1小时后)",
-                added_stop: "🛑 已添加站点",
-                welcome_msg: "👋 <b>CoolRide 新手?</b> 尝试搜索 'Bedok Reservoir' 查看我们的水冷 AI！"
+                start: "📍 起点", dest: "🎯 终点", time: "⏰ 出发时间",
+                btn_find: "🚀 寻找清凉路线", btn_download: "下载 KML 文件",
+                status_ready: "准备连接...", status_compute: "⏳ 正在连接 AI 大脑...",
+                ai_title: "🤖 AI 热量预测", ai_current: "当前热应力", ai_predict: "预测 (1小时后)",
+                added_stop: "🛑 已添加站点", welcome_msg: "👋 <b>CoolRide 新手?</b> 尝试搜索 'Bedok Reservoir' 查看我们的水冷 AI！"
             },
             ta: {
-                start: "📍 தொடக்கப் புள்ளி",
-                dest: "🎯 சேருமிடம்",
-                time: "⏰ புறப்படும் நேரம்",
-                btn_find: "🚀 குளிர்ந்த பாதையை கண்டுபிடி",
-                btn_download: "KML பதிவிறக்கவும்",
-                status_ready: "இணைக்கத் தயாராக உள்ளது...",
-                status_compute: "⏳ AI உடன் இணைகிறது...",
-                ai_title: "🤖 AI வெப்ப முன்னறிவிப்பு",
-                ai_current: "தற்போதைய வெப்பம்",
-                ai_predict: "கணிப்பு (1 மணி)",
-                added_stop: "🛑 நிறுத்தம் சேர்க்கப்பட்டது",
-                welcome_msg: "👋 <b>CoolRide-க்கு புதியவரா?</b> எங்கள் நீர்-குளிரூட்டும் AI-ஐ காண 'Bedok Reservoir'-ஐ தேடவும்!"
+                start: "📍 தொடக்கப் புள்ளி", dest: "🎯 சேருமிடம்", time: "⏰ புறப்படும் நேரம்",
+                btn_find: "🚀 குளிர்ந்த பாதையை கண்டுபிடி", btn_download: "KML பதிவிறக்கவும்",
+                status_ready: "இணைக்கத் தயாராக உள்ளது...", status_compute: "⏳ AI உடன் இணைகிறது...",
+                ai_title: "🤖 AI வெப்ப முன்னறிவிப்பு", ai_current: "தற்போதைய வெப்பம்", ai_predict: "கணிப்பு (1 மணி)",
+                added_stop: "🛑 நிறுத்தம் சேர்க்கப்பட்டது", welcome_msg: "👋 <b>CoolRide-க்கு புதியவரா?</b> எங்கள் நீர்-குளிரூட்டும் AI-ஐ காண 'Bedok Reservoir'-ஐ தேடவும்!"
             }
         };
 
         function changeLanguage(lang) {
             document.body.style.fontFamily = lang === 'en' ? "'Inter', sans-serif" : (lang === 'zh' ? "'Noto Sans SC', sans-serif" : "'Noto Sans Tamil', sans-serif");
-            
             document.querySelectorAll('[data-lang]').forEach(el => {
                 var key = el.getAttribute('data-lang');
-                if (translations[lang][key]) {
-                    el.innerHTML = translations[lang][key];
-                }
+                if (translations[lang][key]) el.innerHTML = translations[lang][key];
             });
         }
 
-        // --- LOCAL STORAGE ---
+        // --- APP LOGIC ---
         var savedUrl = localStorage.getItem("coolride_api_url");
         if (savedUrl) document.getElementById("apiUrl").value = savedUrl;
         document.getElementById("apiUrl").addEventListener("input", function() {
             localStorage.setItem("coolride_api_url", this.value);
         });
 
-        // --- STOP MANAGEMENT ---
         window.addStop = function(coords, name) {
             document.getElementById("stopBox").style.display = "block";
             document.getElementById("stop").value = name;
@@ -238,7 +245,6 @@
             }
         }
 
-        // --- DOWNLOAD KML ---
         window.downloadKml = function() {
             if (!lastKmlData) return alert("No route generated yet!");
             var element = document.createElement('a');
@@ -250,7 +256,6 @@
             document.body.removeChild(element);
         };
 
-        // --- MAIN LOGIC ---
         async function calculateRoute(isBaseRoute) {
             var url = document.getElementById("apiUrl").value.trim();
             if (url.endsWith('/')) url = url.slice(0, -1);
@@ -265,7 +270,7 @@
             status.innerText = translations[lang].status_compute;
             
             if (routeLayer) map.removeLayer(routeLayer);
-            document.getElementById("downloadBtn").style.display = "none"; // Hide download while loading
+            document.getElementById("downloadBtn").style.display = "none"; 
 
             var payload = {
                 start: document.getElementById("start").value,
@@ -282,7 +287,7 @@
 
                 if (result.status === "success") {
                     if (isBaseRoute) baseRouteData = result;
-                    lastKmlData = result.kml_data; // Store for download
+                    lastKmlData = result.kml_data; 
                     renderResult(result);
                     btn.disabled = false;
                     btn.innerText = translations[lang].btn_find;
@@ -342,11 +347,10 @@
                         insightBox.style.borderLeftColor = borderColor;
                     }
                     
-                    // Show Timer & Download Button
                     var duration = result.meta ? result.meta.duration : "Cached";
                     document.getElementById("status").innerText = "✅ Route Loaded (" + duration + ")";
                     document.getElementById("status").style.color = "green";
-                    document.getElementById("downloadBtn").style.display = "flex"; // Show button
+                    document.getElementById("downloadBtn").style.display = "flex"; 
                 })
                 .addTo(map);
         }
