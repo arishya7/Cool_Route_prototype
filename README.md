@@ -1,91 +1,64 @@
-# 🚴 CoolRide: Thermal Comfort Routing for Cyclists
-
-**A Prototype for mitigating Urban Heat Island (UHI) exposure for bike and cycle riders in Singapore.**
-
-### 🌍 Project Overview
-CoolRide is an intelligent routing engine that prioritizes **thermal safety** over speed. Unlike standard navigation apps that optimize for distance, CoolRide calculates the **Wet Bulb Globe Temperature (WBGT)** exposure and finds routes that maximize shade coverage.
-
-It uses a "Blue-Green-Grey" infrastructure approach, prioritizing **Park Connectors (PCN)**, **Urban Tree Canopies**, **Water Bodies**, and **Building Shadows** to find the coolest possible path.
+# 🚀 **CoolRide V9.1: The "Global Edition" Engine**
+### *Live AI. Multi-Language. Production-Ready.*
 
 ---
 
-### 🚀 Key Features (New in V5)
+### **🌍 Project Overview**
+CoolRide V9.1 is the fully realized **"Digital Twin"** of Singapore's urban heat profile. It combines real-time shadow simulation, tree canopy analysis, and blue infrastructure cooling to find the safest, coolest path for cyclists.
 
-* **💧 Water Body Cooling:** Models evaporative and convective cooling effects from water bodies (reservoirs, lakes) with 100m proximity buffers. Filters significant water features (>0.1 km²) and applies up to 45% thermal cost reduction.
-* **☀️ Dynamic Building Shadows:** Calculates real-time shadows cast by buildings based on the sun's exact position (Elevation & Azimuth) and building height data.
-* **⏰ Time-Aware Routing:** The optimal route changes throughout the day. A path shaded by buildings at 9 AM might be exposed at 12 PM. CoolRide adapts.
-* **🤖 Hybrid AI Engine:** Combines real-time NEA weather data with a custom Linear Regression model (with physics clamping) to forecast heat stress 15 minutes into the future.
-* **🌳 Blue-Green Infrastructure:** Integrates **SGTrees** (Canopy), **Park Connectors** (PCN), **Water Bodies** (Cooling effect), and **Building Shadows** for holistic thermal scoring with smart combined discounts (up to 65% reduction for triple coverage).
-* **🛡️ Fail-Safe Protocol:** Includes a "Government Override" mode to force maximum safety routes during national heatwave alerts.
+Unlike early prototypes, V9.1 is a **Live Distributed System**. It runs the heavy AI computation on a cloud GPU/CPU (Colab), exposes a secure API tunnel (Ngrok), and serves a responsive, multi-language web application to any device instantly.
 
 ---
 
-### 📂 Project Structure
+### **🔥 What's New in V9.1? (The "Global Launch" Update)**
 
-The repository is organized into two main components:
+1.  **⚡ Live API Server (Ngrok Tunnel):**
+    * **Old Way:** Static file uploads (Slow, 1-minute delay).
+    * **V9 Way:** A real-time Flask API. Click "Route" on the web app, and the Python engine computes it instantly.
 
-```text
-Cool_Route_prototype/
-├── data/                        # 💾 Geospatial Data Lake
-│   ├── trees.csv                # Urban Tree Canopy Data (Trees.sg)
-│   ├── ParkConnectorLoop.geojson # NParks Cycling Path Network
-│   ├── HawkerCentresGEOJSON.geojson # Shelter Locations
-│   └── water.geojson            # Water Bodies (Reservoirs, Lakes)
-│
-├── output/                      # ☁️ Live Route Deployments
-│   └── latest_route.kml         # The active AI-generated route (Pushed by Python)
-│
-├── Cool_route_v5.2.ipynb        # 🧠 LATEST: User Input Version
-├── Cool_route_v5.ipynb          # 🧠 AI & Spatial Analysis Engine (Pre-configured)
-├── Cool_route_v4.ipynb          # Previous version (Building Shadows)
-├── index.html                   # 🗺️ Standalone Leaflet Viewer (For rapid testing)
-└── README.md                    # Project Documentation
-```
+2.  **🤖 Physics-Informed AI Forecasting:**
+    * **New Feature:** A Diurnal Cycle Model (Sine Wave Regression) that predicts heat stress 1 hour into the future based on the sun's position and current sensor data.
 
+3.  **🛑 Interactive Multi-Stop Routing:**
+    * **New Feature:** Users can click on **Hawker Centres (🍜)** or **Supermarkets (🛒)** along the route to instantly add a "Pit Stop." The engine seamlessly stitches the coolest path to the stop and then to the destination.
 
-### 📊 Data Sources
-* Weather: National Environment Agency (NEA) API ([Real-time WBGT](https://data.gov.sg/datasets?query=wbgt&resultId=d_87884af1f85d702d4f74c6af13b4853d))
+4.  **🌐 Global Accessibility Suite:**
+    * **Multi-Language:** Instantly toggle between **English**, **Mandarin (中文)**, and **Tamil (தமிழ்)**.
+    * **Smart Caching:** Instant "Undo" functionality when removing stops.
+    * **Data Export:** Download routes as `.kml` for use in Google Earth/Maps.
 
-* Road Network & Buildings: OpenStreetMap (via OSMnx)
+---
 
-* Vegetation: Trees.sg (Processed via [SGTrees](https://github.com/cheeaun/sgtreesdata/tree/main))
+### **🏗️ System Architecture**
 
-* Infrastructure: [NParks Park Connector Network (GeoJSON)](https://data.gov.sg/datasets/d_a69ef89737379f231d2ae93fd1c5707f/view)
+`[ 📱 Web App (Frontend) ]`  <--->  `[ 🚇 Ngrok Secure Tunnel ]`  <--->  `[ 🧠 Python AI Server (Backend) ]`
 
-* Blue Spaces: OpenStreetMap Water Features
+1.  **Request:** User selects Start/End on the website.
+2.  **Compute:** Python Engine calculates Shadows, Trees, Water, and AI Weather trends.
+3.  **Response:** Server returns a JSON payload with the Route (KML), Amenities, and AI Forecast.
+4.  **Render:** The Web App draws the route, amenities, and forecast card in < 200ms.
 
-### 🏃 How to Run (The Engine)
+---
 
-#### **Option 1: Interactive User Input (Recommended) - V5.2**
-* Open the Colab Notebook (`Cool_route_v5.2.ipynb`).
+### **🏃 How to Run the Demo**
 
-* **User-Friendly Input:** The notebook will prompt you to enter:
-  * Starting point (place name like "Redhill MRT" OR coordinates)
-  * Ending point (place name like "Marina Bay Sands" OR coordinates)
-  * Departure time (optional - defaults to current time if not provided)
+**Step 1: Launch the Brain**
+* In [this notebook](https://github.com/swaminaathakrishnan/Cool_Route_prototype/blob/master/notebooks/Cool_route_v9.1.ipynb), click **Runtime -> Run All**.
+* Scroll to the bottom of **Module 7**.
+* Copy the public URL: `https://xxxx-xxxx.ngrok-free.app`
 
-* The code is configured to pull data directly from this repository's `/data` folder.
+**Step 2: Connect the Interface**
+* Open the [Live Dashboard](https://swaminaathakrishnan.github.io/Cool_Route_prototype/).
+* Paste the URL into the **"Server Connection"** box.
 
-* Run all cells. The script will:
-  * Geocode your place names automatically (if provided)
-  * Calculate sun position and building shadows
-  * Apply time-dependent shade decay (morning/evening vs. midday)
-  * Load water body data and create cooling proximity buffers
-  * Fetch live weather from the nearest NEA sensor
-  * Generate a `.kml` route file in the `output/` folder
+**Step 3: Impress**
+* Click **"Find Cool Route"**.
+* **Demo the AI:** Show the "AI Thermal Forecast" card.
+* **Demo the Interactivity:** Click a Hawker Centre icon -> "Add Stop".
+* **Demo the Polish:** Switch Language to Tamil/Mandarin.
 
-#### **Option 2: Pre-configured Routes - V5**
-* Open the Colab Notebook (`Cool_route_v5.ipynb`).
+---
 
-* Edit the hardcoded coordinates in Module 2 (Configuration) to set your route.
-
-* Run all cells for automated route generation without user prompts.
-
-#### **View the Route:**
-* Download `latest_route.kml` and view it in `index.html` (Leaflet Viewer) or Google My Maps.
-
-### 👥 Team
-* Swaminaatha Krishnan
-* Arishya Jindal
-* Luo Ziyi
-* Stefanus Arda 
+### **👥 Credits**
+* **Swaminaatha Krishnan:** System Architect & Full-Stack Integration
+* **Arishya Jindal:** Algorithm Lead (Shadows & Spatial Intelligence)
