@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CoolRide V8.1: Final Prototype</title>
+    <title>CoolRide V8.2: Live Demo</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     
@@ -27,7 +27,6 @@
         .stop-label { font-size: 11px; color: #2563eb; font-weight: 700; display: flex; justify-content: space-between; }
         .remove-stop { cursor: pointer; color: #ef4444; }
 
-        /* AI Card Styles */
         .ai-card { display: none; margin-top: 5px; background: #f8fafc; border-radius: 12px; padding: 15px; border: 1px solid #e2e8f0; }
         .ai-title { font-size: 10px; font-weight: 700; color: #64748b; letter-spacing: 0.5px; margin-bottom: 8px; }
         .ai-stats { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
@@ -36,14 +35,13 @@
         .ai-forecast-temp { font-size: 16px; font-weight: 600; color: #64748b; }
         .ai-insight-box { font-size: 12px; line-height: 1.4; color: #334155; padding: 10px; background: white; border-radius: 6px; border-left: 4px solid #cbd5e1; }
         
-        /* Custom Emoji Markers */
         .emoji-icon { font-size: 24px; text-align: center; line-height: 1; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); }
     </style>
 </head>
 <body>
 
     <div id="panel">
-        <h2 style="margin:0 0 5px 0;">🚴 CoolRide <span style="font-size:12px;color:white;background:#22c55e;padding:2px 6px;border-radius:10px;">V8.1</span></h2>
+        <h2 style="margin:0 0 5px 0;">🚴 CoolRide <span style="font-size:12px;color:white;background:#22c55e;padding:2px 6px;border-radius:10px;">V8.2</span></h2>
         
         <input type="text" id="apiUrl" placeholder="🔌 Paste Ngrok URL Here" style="font-family:monospace; font-size:11px; background:#f8fafc;">
         
@@ -62,7 +60,7 @@
         <label>⏰ Departure Time</label>
         <input type="time" id="time" value="14:00">
         
-        <button id="btn-route" onclick="calculateRoute()">🚀 Find Cool Route</button>
+        <button id="btn-route" onclick="calculateRoute(true)">🚀 Find Cool Route</button>
         <div id="status" style="text-align:center;font-size:13px;color:#64748b;margin-top:5px;">Ready</div>
 
         <div id="ai-card" class="ai-card">
@@ -92,27 +90,20 @@
         var routeLayer = null;
 
         // --- CACHING VARIABLES ---
-        var cachedKml = null;     // Stores the XML of the route
-        var cachedAiData = null;  // Stores the AI card data
-        var isMultiStop = false;  // Flags if we are currently in detour mode
+        var baseRouteData = null; // Saves the original "A to B" result
 
-        // --- 1. LOCAL STORAGE LOGIC ---
-        // Auto-load URL if saved previously
+        // Load URL
         var savedUrl = localStorage.getItem("coolride_api_url");
         if (savedUrl) document.getElementById("apiUrl").value = savedUrl;
-
-        // Save URL when input changes
         document.getElementById("apiUrl").addEventListener("input", function() {
             localStorage.setItem("coolride_api_url", this.value);
         });
 
-        // --- 2. STOP MANAGEMENT ---
         window.addStop = function(coords, name) {
             document.getElementById("stopBox").style.display = "block";
             document.getElementById("stop").value = name;
             document.getElementById("stopCoords").value = coords;
-            isMultiStop = true;
-            calculateRoute(true); // 'true' means this is a fresh calculation
+            calculateRoute(false); // 'false' = don't overwrite base cache
         };
 
         function removeStop() {
@@ -120,19 +111,17 @@
             document.getElementById("stop").value = "";
             document.getElementById("stopCoords").value = "";
             
-            // RESTORE CACHE (Instant Load)
-            if (cachedKml) {
-                console.log("Restoring cached route...");
-                isMultiStop = false;
-                renderKml(cachedKml, cachedAiData);
-                document.getElementById("status").innerText = "✅ Restored Original Route";
+            // INSTANT RESTORE FROM CACHE
+            if (baseRouteData) {
+                console.log("Restoring base route from cache...");
+                renderResult(baseRouteData);
+                document.getElementById("status").innerText = "✅ Restored Original Route (Cached)";
             } else {
                 calculateRoute(true);
             }
         }
 
-        // --- 3. MAIN LOGIC ---
-        async function calculateRoute(isFresh) {
+        async function calculateRoute(isBaseRoute) {
             var url = document.getElementById("apiUrl").value.trim();
             if (url.endsWith('/')) url = url.slice(0, -1);
             if (!url) return alert("⚠️ Please paste Server URL!");
@@ -163,20 +152,13 @@
                 let result = await response.json();
 
                 if (result.status === "success") {
-                    // Cache the result if this is a standard route (no stop)
-                    if (!document.getElementById("stopCoords").value) {
-                        cachedKml = result.kml_data;
-                        cachedAiData = result.ai_data;
-                        isMultiStop = false;
+                    // SAVE CACHE only if this is a Base Route (Start->End)
+                    if (isBaseRoute) {
+                        baseRouteData = result;
                     }
-                    
-                    renderKml(result.kml_data, result.ai_data);
-                    
-                    status.innerText = "✅ Optimized Route Loaded";
-                    status.style.color = "green";
+                    renderResult(result);
                     btn.disabled = false;
                     btn.innerText = "Find Cool Route";
-
                 } else { throw new Error(result.message); }
             } catch (error) {
                 console.error(error);
@@ -186,12 +168,11 @@
             }
         }
 
-        // --- 4. RENDERER (Handles KML + Icons) ---
-        function renderKml(kmlString, aiData) {
-            var kmlBlob = new Blob([kmlString], {type: "text/xml"});
+        function renderResult(result) {
+            // Render KML
+            var kmlBlob = new Blob([result.kml_data], {type: "text/xml"});
             var kmlUrl = URL.createObjectURL(kmlBlob);
 
-            // Custom Style for Lines
             var customStyle = L.geoJson(null, {
                 style: function(f) {
                     var name = f.properties.name || "";
@@ -199,19 +180,22 @@
                     if (name.includes("Cool")) return { color: "#22c55e", weight: 6, opacity: 0.9 };
                     return { color: "#3b82f6", weight: 4 };
                 },
-                // CUSTOM POINT TO LAYER (The Emoji Fix)
                 pointToLayer: function(feature, latlng) {
+                    // ROBUST EMOJI CHECK (Checks Name AND Description)
                     var name = feature.properties.name || "";
-                    var iconHtml = "📍"; // Default
-                    if (name.includes("🍜") || name.includes("Hawker")) iconHtml = "🍜";
-                    if (name.includes("🛒") || name.includes("Supermarket")) iconHtml = "🛒";
+                    var desc = feature.properties.description || "";
+                    var text = (name + " " + desc).toLowerCase();
+                    
+                    var iconHtml = "📍"; 
+                    if (text.includes("🍜") || text.includes("hawker")) iconHtml = "🍜";
+                    if (text.includes("🛒") || text.includes("supermarket")) iconHtml = "🛒";
 
                     return L.marker(latlng, {
                         icon: L.divIcon({
                             className: 'emoji-icon',
                             html: iconHtml,
                             iconSize: [30, 30],
-                            iconAnchor: [15, 15] // Center the emoji
+                            iconAnchor: [15, 15]
                         })
                     });
                 }
@@ -221,24 +205,29 @@
                 .on('ready', function() {
                     map.fitBounds(routeLayer.getBounds(), {padding: [50, 50]});
                     this.eachLayer(function(layer) {
-                        // Bind Popups for BOTH Lines and Points
                         if (layer.feature && layer.feature.properties.description) {
                             layer.bindPopup(layer.feature.properties.description);
                         }
                     });
-                    
-                    // Populate AI Card
-                    if (aiData) {
+
+                    // Render AI Data
+                    if (result.ai_data) {
+                        var ai = result.ai_data;
                         document.getElementById("ai-card").style.display = "block";
-                        document.getElementById("ai-temp").innerText = aiData.current_temp + "°C";
-                        document.getElementById("ai-forecast").innerText = aiData.forecast_temp + "°C";
+                        document.getElementById("ai-temp").innerText = ai.current_temp + "°C";
+                        document.getElementById("ai-forecast").innerText = ai.forecast_temp + "°C";
                         var insightBox = document.getElementById("ai-insight");
-                        insightBox.innerText = aiData.insight;
+                        insightBox.innerText = ai.insight;
                         var borderColor = "#22c55e"; 
-                        if (aiData.color === "red") borderColor = "#ef4444";
-                        if (aiData.color === "orange") borderColor = "#f59e0b";
+                        if (ai.color === "red") borderColor = "#ef4444";
+                        if (ai.color === "orange") borderColor = "#f59e0b";
                         insightBox.style.borderLeftColor = borderColor;
                     }
+                    
+                    // Show Timer Status
+                    var duration = result.meta ? result.meta.duration : "Unknown";
+                    document.getElementById("status").innerText = "✅ Optimized Route Loaded (" + duration + ")";
+                    document.getElementById("status").style.color = "green";
                 })
                 .addTo(map);
         }
