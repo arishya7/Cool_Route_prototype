@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CoolRide V8.0: AI Thermal Routing</title>
+    <title>CoolRide V8.1: Final Prototype</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     
@@ -16,7 +16,7 @@
             padding: 24px; border-radius: 16px; box-shadow: 0 12px 40px rgba(0,0,0,0.12);
             z-index: 1000; border: 1px solid rgba(0,0,0,0.05);
             display: flex; flex-direction: column; gap: 12px;
-            max-height: 90vh; overflow-y: auto; /* Scroll if panel gets too tall */
+            max-height: 90vh; overflow-y: auto;
         }
         label { font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: -8px;}
         input { width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px; box-sizing: border-box; font-family: 'Inter';}
@@ -28,30 +28,22 @@
         .remove-stop { cursor: pointer; color: #ef4444; }
 
         /* AI Card Styles */
-        .ai-card {
-            display: none; /* Hidden by default */
-            margin-top: 5px; 
-            background: #f8fafc; 
-            border-radius: 12px; 
-            padding: 15px; 
-            border: 1px solid #e2e8f0;
-        }
+        .ai-card { display: none; margin-top: 5px; background: #f8fafc; border-radius: 12px; padding: 15px; border: 1px solid #e2e8f0; }
         .ai-title { font-size: 10px; font-weight: 700; color: #64748b; letter-spacing: 0.5px; margin-bottom: 8px; }
         .ai-stats { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
         .ai-main-temp { font-size: 24px; font-weight: 700; color: #1e293b; }
         .ai-sub-text { font-size: 11px; color: #64748b; }
         .ai-forecast-temp { font-size: 16px; font-weight: 600; color: #64748b; }
-        .ai-insight-box { 
-            font-size: 12px; line-height: 1.4; color: #334155; 
-            padding: 10px; background: white; border-radius: 6px; 
-            border-left: 4px solid #cbd5e1; 
-        }
+        .ai-insight-box { font-size: 12px; line-height: 1.4; color: #334155; padding: 10px; background: white; border-radius: 6px; border-left: 4px solid #cbd5e1; }
+        
+        /* Custom Emoji Markers */
+        .emoji-icon { font-size: 24px; text-align: center; line-height: 1; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); }
     </style>
 </head>
 <body>
 
     <div id="panel">
-        <h2 style="margin:0 0 5px 0;">🚴 CoolRide <span style="font-size:12px;color:white;background:#22c55e;padding:2px 6px;border-radius:10px;">V8.0</span></h2>
+        <h2 style="margin:0 0 5px 0;">🚴 CoolRide <span style="font-size:12px;color:white;background:#22c55e;padding:2px 6px;border-radius:10px;">V8.1</span></h2>
         
         <input type="text" id="apiUrl" placeholder="🔌 Paste Ngrok URL Here" style="font-family:monospace; font-size:11px; background:#f8fafc;">
         
@@ -75,7 +67,6 @@
 
         <div id="ai-card" class="ai-card">
             <div class="ai-title">🤖 AI THERMAL FORECAST</div>
-            
             <div class="ai-stats">
                 <div>
                     <div class="ai-main-temp" id="ai-temp">--°C</div>
@@ -86,12 +77,8 @@
                     <div class="ai-sub-text">Predicted (1h)</div>
                 </div>
             </div>
-            
-            <div id="ai-insight" class="ai-insight-box">
-                AI analysis will appear here...
-            </div>
+            <div id="ai-insight" class="ai-insight-box">AI analysis will appear here...</div>
         </div>
-
     </div>
 
     <div id="map"></div>
@@ -104,21 +91,48 @@
         L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { attribution: 'OSM' }).addTo(map);
         var routeLayer = null;
 
+        // --- CACHING VARIABLES ---
+        var cachedKml = null;     // Stores the XML of the route
+        var cachedAiData = null;  // Stores the AI card data
+        var isMultiStop = false;  // Flags if we are currently in detour mode
+
+        // --- 1. LOCAL STORAGE LOGIC ---
+        // Auto-load URL if saved previously
+        var savedUrl = localStorage.getItem("coolride_api_url");
+        if (savedUrl) document.getElementById("apiUrl").value = savedUrl;
+
+        // Save URL when input changes
+        document.getElementById("apiUrl").addEventListener("input", function() {
+            localStorage.setItem("coolride_api_url", this.value);
+        });
+
+        // --- 2. STOP MANAGEMENT ---
         window.addStop = function(coords, name) {
             document.getElementById("stopBox").style.display = "block";
             document.getElementById("stop").value = name;
             document.getElementById("stopCoords").value = coords;
-            calculateRoute();
+            isMultiStop = true;
+            calculateRoute(true); // 'true' means this is a fresh calculation
         };
 
         function removeStop() {
             document.getElementById("stopBox").style.display = "none";
             document.getElementById("stop").value = "";
             document.getElementById("stopCoords").value = "";
-            calculateRoute();
+            
+            // RESTORE CACHE (Instant Load)
+            if (cachedKml) {
+                console.log("Restoring cached route...");
+                isMultiStop = false;
+                renderKml(cachedKml, cachedAiData);
+                document.getElementById("status").innerText = "✅ Restored Original Route";
+            } else {
+                calculateRoute(true);
+            }
         }
 
-        async function calculateRoute() {
+        // --- 3. MAIN LOGIC ---
+        async function calculateRoute(isFresh) {
             var url = document.getElementById("apiUrl").value.trim();
             if (url.endsWith('/')) url = url.slice(0, -1);
             if (!url) return alert("⚠️ Please paste Server URL!");
@@ -131,9 +145,6 @@
             status.innerText = "⏳ Connecting to AI Brain...";
             
             if (routeLayer) map.removeLayer(routeLayer);
-
-            // Hide AI card while loading
-            document.getElementById("ai-card").style.display = "none";
 
             var payload = {
                 start: document.getElementById("start").value,
@@ -152,50 +163,19 @@
                 let result = await response.json();
 
                 if (result.status === "success") {
-                    var kmlBlob = new Blob([result.kml_data], {type: "text/xml"});
-                    var kmlUrl = URL.createObjectURL(kmlBlob);
-
-                    var customStyle = L.geoJson(null, {
-                        style: function(f) {
-                            var name = f.properties.name || "";
-                            if (name.includes("Fastest")) return { color: "#ef4444", weight: 5, opacity: 0.6 };
-                            if (name.includes("Cool")) return { color: "#22c55e", weight: 6, opacity: 0.9 };
-                            return { color: "#3b82f6", weight: 4 };
-                        }
-                    });
-
-                    routeLayer = omnivore.kml(kmlUrl, null, customStyle)
-                        .on('ready', function() {
-                            map.fitBounds(routeLayer.getBounds(), {padding: [50, 50]});
-                            this.eachLayer(function(layer) {
-                                if (layer.feature && layer.feature.properties.description) {
-                                    layer.bindPopup(layer.feature.properties.description);
-                                }
-                            });
-                            
-                            status.innerText = "✅ Optimized Route Loaded";
-                            status.style.color = "green";
-                            btn.disabled = false;
-                            btn.innerText = "Find Cool Route";
-
-                            // --- POPULATE AI CARD ---
-                            if (result.ai_data) {
-                                var ai = result.ai_data;
-                                document.getElementById("ai-card").style.display = "block";
-                                document.getElementById("ai-temp").innerText = ai.current_temp + "°C";
-                                document.getElementById("ai-forecast").innerText = ai.forecast_temp + "°C";
-                                
-                                var insightBox = document.getElementById("ai-insight");
-                                insightBox.innerText = ai.insight;
-                                
-                                // Dynamic Border Color based on risk
-                                var borderColor = "#22c55e"; // Green default
-                                if (ai.color === "red") borderColor = "#ef4444";
-                                if (ai.color === "orange") borderColor = "#f59e0b";
-                                insightBox.style.borderLeftColor = borderColor;
-                            }
-                        })
-                        .addTo(map);
+                    // Cache the result if this is a standard route (no stop)
+                    if (!document.getElementById("stopCoords").value) {
+                        cachedKml = result.kml_data;
+                        cachedAiData = result.ai_data;
+                        isMultiStop = false;
+                    }
+                    
+                    renderKml(result.kml_data, result.ai_data);
+                    
+                    status.innerText = "✅ Optimized Route Loaded";
+                    status.style.color = "green";
+                    btn.disabled = false;
+                    btn.innerText = "Find Cool Route";
 
                 } else { throw new Error(result.message); }
             } catch (error) {
@@ -204,6 +184,63 @@
                 btn.disabled = false;
                 btn.innerText = "Try Again";
             }
+        }
+
+        // --- 4. RENDERER (Handles KML + Icons) ---
+        function renderKml(kmlString, aiData) {
+            var kmlBlob = new Blob([kmlString], {type: "text/xml"});
+            var kmlUrl = URL.createObjectURL(kmlBlob);
+
+            // Custom Style for Lines
+            var customStyle = L.geoJson(null, {
+                style: function(f) {
+                    var name = f.properties.name || "";
+                    if (name.includes("Fastest")) return { color: "#ef4444", weight: 5, opacity: 0.6 };
+                    if (name.includes("Cool")) return { color: "#22c55e", weight: 6, opacity: 0.9 };
+                    return { color: "#3b82f6", weight: 4 };
+                },
+                // CUSTOM POINT TO LAYER (The Emoji Fix)
+                pointToLayer: function(feature, latlng) {
+                    var name = feature.properties.name || "";
+                    var iconHtml = "📍"; // Default
+                    if (name.includes("🍜") || name.includes("Hawker")) iconHtml = "🍜";
+                    if (name.includes("🛒") || name.includes("Supermarket")) iconHtml = "🛒";
+
+                    return L.marker(latlng, {
+                        icon: L.divIcon({
+                            className: 'emoji-icon',
+                            html: iconHtml,
+                            iconSize: [30, 30],
+                            iconAnchor: [15, 15] // Center the emoji
+                        })
+                    });
+                }
+            });
+
+            routeLayer = omnivore.kml(kmlUrl, null, customStyle)
+                .on('ready', function() {
+                    map.fitBounds(routeLayer.getBounds(), {padding: [50, 50]});
+                    this.eachLayer(function(layer) {
+                        // Bind Popups for BOTH Lines and Points
+                        if (layer.feature && layer.feature.properties.description) {
+                            layer.bindPopup(layer.feature.properties.description);
+                        }
+                    });
+                    
+                    // Populate AI Card
+                    if (aiData) {
+                        document.getElementById("ai-card").style.display = "block";
+                        document.getElementById("ai-temp").innerText = aiData.current_temp + "°C";
+                        document.getElementById("ai-forecast").innerText = aiData.forecast_temp + "°C";
+                        var insightBox = document.getElementById("ai-insight");
+                        insightBox.innerText = aiData.insight;
+                        var borderColor = "#22c55e"; 
+                        if (aiData.color === "red") borderColor = "#ef4444";
+                        if (aiData.color === "orange") borderColor = "#f59e0b";
+                        insightBox.style.borderLeftColor = borderColor;
+                    }
+                })
+                .addTo(map);
         }
     </script>
 </body>
