@@ -241,8 +241,8 @@
         function getApiUrl() {
             // Check if we're on Render (production)
             if (window.location.hostname.includes('onrender.com')) {
-                // Use Cloud Run backend (change this after deployment)
-                return 'YOUR_CLOUD_RUN_URL_HERE';
+                // Use Cloud Run backend
+                return 'https://coolride-31321267938.asia-southeast1.run.app';
             }
             // Local development
             return 'http://localhost:5001';
