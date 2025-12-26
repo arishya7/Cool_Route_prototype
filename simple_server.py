@@ -433,10 +433,11 @@ def calculate_route_v53(start_lat, start_lon, end_lat, end_lon, departure_time):
                         lat, lon = row.geometry.centroid.y, row.geometry.centroid.x
                     amenities_list.append((name, lat, lon, "Hawker"))
 
-        # B. Load supermarkets from OSM
-        shop_tags = {'shop': 'supermarket'}
-        shop_pois = ox.features_from_point((start_lat, start_lon), tags=shop_tags, dist=2000)
-        if not shop_pois.empty:
+        # B. Skip supermarkets and MRT (too slow on free tier)
+        print("   ⚠️ Skipping OSM amenities (optimized for speed)")
+        if False:  # Disabled for performance
+            shop_pois = ox.features_from_point((start_lat, start_lon), tags={}, dist=2000)
+        if False:
             for idx, row in shop_pois.iterrows():
                 name = row.get('name', 'Unknown')
                 if name == 'Unknown':
