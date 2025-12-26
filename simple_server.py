@@ -280,10 +280,44 @@ def calculate_route_v53(start_lat, start_lon, end_lat, end_lon, departure_time):
 
     # 1. GET GRAPH - USE PRE-LOADED NETWORK
     try:
-        # Check if pre-downloaded network exists
-        if os.path.exists('data/tampines_network.graphml'):
-            print("   📦 Loading pre-downloaded network...")
-            G = ox.load_graphml('data/tampines_network.graphml')
+        # List of cached networks with their center points
+        cached_networks = {
+            'tampines': (1.3530, 103.9450, 2000),
+            'orchard': (1.3048, 103.8318, 2000),
+            'marina_bay': (1.2806, 103.8510, 2000),
+            'city_hall': (1.2930, 103.8520, 2000),
+            'chinatown': (1.2838, 103.8446, 2000),
+            'botanic_gardens': (1.3138, 103.8159, 2000),
+            'east_coast_park': (1.3010, 103.9140, 2500),
+            'sentosa': (1.2494, 103.8303, 2000),
+            'bedok': (1.3236, 103.9273, 2000),
+            'pasir_ris': (1.3721, 103.9474, 2000),
+            'changi': (1.3644, 103.9915, 2000),
+            'bishan': (1.3521, 103.8484, 2000),
+            'ang_mo_kio': (1.3691, 103.8454, 2000),
+            'clementi': (1.3162, 103.7649, 2000),
+            'jurong_east': (1.3329, 103.7436, 2000),
+        }
+
+        # Find closest cached network
+        G = None
+        best_match = None
+        min_distance = float('inf')
+
+        for name, (lat, lon, radius) in cached_networks.items():
+            filename = f'data/{name}_network.graphml'
+            if os.path.exists(filename):
+                # Calculate distance from start point to cache center
+                import math
+                distance = math.sqrt((start_lat - lat)**2 + (start_lon - lon)**2) * 111000  # rough meters
+                if distance < radius and distance < min_distance:
+                    min_distance = distance
+                    best_match = (name, filename)
+
+        if best_match:
+            name, filename = best_match
+            print(f"   📦 Loading cached {name} network...")
+            G = ox.load_graphml(filename)
             print(f"   ✅ Network loaded! ({len(G.nodes)} nodes, {len(G.edges)} edges)")
         else:
             # Fallback to downloading (slow, for other locations)
