@@ -36,7 +36,7 @@ def after_request(response):
 PCN_URL = "data/ParkConnectorLoop.geojson"
 TREES_URL = "data/trees_downloaded.csv"
 WATER_URL = "data/water.geojson"
-HAWKER_URL = "data/HawkerCentresGEOJSON.geojson"
+HAWKER_URL = "data/hawker_centres.geojson"
 
 # Thermal weights from v5.3
 WEIGHT_PCN = 0.5
