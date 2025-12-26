@@ -281,16 +281,25 @@ def calculate_route_v53(start_lat, start_lon, end_lat, end_lon, departure_time):
 
     print(f"⏳ Calculating route from ({start_lat}, {start_lon}) to ({end_lat}, {end_lon})")
 
-    # 1. GET GRAPH
+    # 1. GET GRAPH - USE PRE-LOADED NETWORK
     try:
-        G = ox.graph_from_point((start_lat, start_lon), dist=2000, network_type='bike')
+        # Check if pre-downloaded network exists
+        if os.path.exists('data/tampines_network.graphml'):
+            print("   📦 Loading pre-downloaded network...")
+            G = ox.load_graphml('data/tampines_network.graphml')
+            print(f"   ✅ Network loaded! ({len(G.nodes)} nodes, {len(G.edges)} edges)")
+        else:
+            # Fallback to downloading (slow, for other locations)
+            print("   🔄 Downloading network from OSM (this may be slow)...")
+            G = ox.graph_from_point((start_lat, start_lon), dist=2000, network_type='bike')
+
         nodes = ox.graph_to_gdfs(G, edges=False)
         miny, maxy = nodes.y.min(), nodes.y.max()
         minx, maxx = nodes.x.min(), nodes.x.max()
         print(f"   📐 Zone Limits: Lat[{miny:.4f}, {maxy:.4f}], Lon[{minx:.4f}, {maxx:.4f}]")
     except Exception as e:
         print(f"   ❌ Network Error: {e}")
-        return None, None, None
+        return None, None, None, [], 0, 0
 
     # 2. LOAD PCN
     print("⏳ Loading Park Connectors...")
