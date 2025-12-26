@@ -196,6 +196,14 @@ git commit -m "Add Sentosa cached network"
 git push
 ```
 
+# Iterations
+ Adapted and Built upon multipe version from this repo: https://github.com/swaminaathakrishnan/Cool_Route_prototype.git
+
+## Team 
+- Swaminaatha Krishnan
+- Arishya
+- Ziyi
+- Stefanus 
 
 
 
