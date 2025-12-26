@@ -241,8 +241,8 @@
         function getApiUrl() {
             // Check if we're on Render (production)
             if (window.location.hostname.includes('onrender.com')) {
-                // Extract the frontend URL and construct backend URL
-                return 'https://coolride-api.onrender.com';
+                // Use Cloud Run backend (change this after deployment)
+                return 'YOUR_CLOUD_RUN_URL_HERE';
             }
             // Local development
             return 'http://localhost:5001';
