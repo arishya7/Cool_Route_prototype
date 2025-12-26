@@ -1,1 +1,28 @@
+# Development
 AutoGen/
+venv/
+*.pyc
+__pycache__/
+.ipynb_checkpoints/
+*.pkl
+
+# Cache
+cache/
+
+# System files
+.DS_Store
+*.swp
+*.swo
+*~
+
+# IDE
+.vscode/
+.idea/
+*.code-workspace
+
+# Development notebooks (optional - uncomment to exclude)
+# notebooks/
+
+# Development scripts (optional - uncomment to exclude)
+# download_singapore_network.py
+# flask_server.py

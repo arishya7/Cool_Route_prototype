@@ -117,9 +117,10 @@
             <span data-lang="welcome_msg">👋 <b>New?</b> Try searching "Bedok Reservoir" to see AI cooling!</span>
             <span style="cursor:pointer;opacity:0.5;margin-left:8px;" onclick="document.getElementById('onboarding').style.display='none'">✕</span>
         </div>
-        
-        <input type="text" id="apiUrl" placeholder="🔌 Paste Ngrok URL Here" style="font-family:monospace; font-size:11px; background:#f8fafc;">
-        
+
+        <label data-lang="api_url">🔗 Server URL</label>
+        <input type="text" id="apiUrl" value="" placeholder="Auto-detected">
+
         <label data-lang="start">📍 Start Point</label>
         <input type="text" id="start" value="Tampines MRT" list="sg-locations">
         
@@ -206,21 +207,21 @@
 
         const translations = {
             en: {
-                start: "📍 Start Point", dest: "🎯 Destination", time: "⏰ Departure Time",
+                api_url: "🔗 Server URL", start: "📍 Start Point", dest: "🎯 Destination", time: "⏰ Departure Time",
                 btn_find: "🚀 Find Cool Route", btn_download: "Download KML",
                 status_ready: "Ready to connect...", status_compute: "⏳ Connecting to AI Brain...",
                 ai_title: "🤖 AI THERMAL FORECAST", ai_current: "Current Heat Stress", ai_predict: "Predicted (1h)",
                 added_stop: "🛑 ADDED STOP", welcome_msg: "👋 <b>New?</b> Try searching 'Bedok Reservoir' to see AI cooling!"
             },
             zh: {
-                start: "📍 起点", dest: "🎯 终点", time: "⏰ 出发时间",
+                api_url: "🔗 服务器地址", start: "📍 起点", dest: "🎯 终点", time: "⏰ 出发时间",
                 btn_find: "🚀 寻找清凉路线", btn_download: "下载 KML 文件",
                 status_ready: "准备连接...", status_compute: "⏳ 正在连接 AI 大脑...",
                 ai_title: "🤖 AI 热量预测", ai_current: "当前热应力", ai_predict: "预测 (1小时后)",
                 added_stop: "🛑 已添加站点", welcome_msg: "👋 <b>CoolRide 新手?</b> 尝试搜索 'Bedok Reservoir' 查看我们的水冷 AI！"
             },
             ta: {
-                start: "📍 தொடக்கப் புள்ளி", dest: "🎯 சேருமிடம்", time: "⏰ புறப்படும் நேரம்",
+                api_url: "🔗 சேவையக URL", start: "📍 தொடக்கப் புள்ளி", dest: "🎯 சேருமிடம்", time: "⏰ புறப்படும் நேரம்",
                 btn_find: "🚀 குளிர்ந்த பாதையை கண்டுபிடி", btn_download: "KML பதிவிறக்கவும்",
                 status_ready: "இணைக்கத் தயாராக உள்ளது...", status_compute: "⏳ AI உடன் இணைகிறது...",
                 ai_title: "🤖 AI வெப்ப முன்னறிவிப்பு", ai_current: "தற்போதைய வெப்பம்", ai_predict: "கணிப்பு (1 மணி)",
@@ -236,9 +237,27 @@
             });
         }
 
+        // Auto-detect API URL (production or local)
+        function getApiUrl() {
+            // Check if we're on Render (production)
+            if (window.location.hostname.includes('onrender.com')) {
+                // Extract the frontend URL and construct backend URL
+                return 'https://coolride-api.onrender.com';
+            }
+            // Local development
+            return 'http://localhost:5001';
+        }
+
         var savedUrl = localStorage.getItem("coolride_api_url");
-        if (savedUrl) document.getElementById("apiUrl").value = savedUrl;
-        document.getElementById("apiUrl").addEventListener("input", function() {
+        var apiUrlInput = document.getElementById("apiUrl");
+
+        if (savedUrl) {
+            apiUrlInput.value = savedUrl;
+        } else {
+            apiUrlInput.value = getApiUrl();
+        }
+
+        apiUrlInput.addEventListener("input", function() {
             localStorage.setItem("coolride_api_url", this.value);
         });
 
@@ -248,6 +267,16 @@
             document.getElementById("stopCoords").value = coords;
             calculateRoute(false);
         };
+
+        function authorizeNgrok() {
+            const url = document.getElementById('apiUrl').value.trim();
+            if (!url) {
+                alert('Please paste your ngrok URL first!');
+                return;
+            }
+            document.getElementById('ngrok-status').style.display = 'block';
+            window.open(url, '_blank');
+        }
 
         function removeStop() {
             document.getElementById("stopBox").style.display = "none";
@@ -355,9 +384,12 @@
                     var name = feature.properties.name || "";
                     var desc = feature.properties.description || "";
                     var text = (name + " " + desc).toLowerCase();
-                    var iconHtml = "📍"; 
+                    var iconHtml = "📍";
+
+                    // Food & Shopping
                     if (text.includes("🍜") || text.includes("hawker")) iconHtml = "🍜";
                     if (text.includes("🛒") || text.includes("supermarket")) iconHtml = "🛒";
+                    if (text.includes("🚇") || text.includes("mrt")) iconHtml = "🚇";
 
                     return L.marker(latlng, {
                         icon: L.divIcon({ className: 'emoji-icon', html: iconHtml, iconSize: [30, 30], iconAnchor: [15, 15] })
@@ -394,9 +426,14 @@
                             badge.style.display = "none";
                         }
                     }
-                    
-                    var duration = result.meta ? result.meta.duration : "Cached";
-                    document.getElementById("status").innerText = "✅ Route Loaded (" + duration + ")";
+
+                    // Display route stats
+                    var statusMsg = "✅ Route Loaded";
+                    if (result.meta && result.meta.cool_distance && result.meta.cool_duration) {
+                        var distKm = (parseFloat(result.meta.cool_distance) / 1000).toFixed(1);
+                        statusMsg = "✅ Cool Route: " + distKm + "km · " + result.meta.cool_duration + " min";
+                    }
+                    document.getElementById("status").innerText = statusMsg;
                     document.getElementById("status").style.color = "green";
                     document.getElementById("downloadBtn").style.display = "flex"; 
                 })
