@@ -32,14 +32,11 @@ def after_request(response):
     response.headers.add('Access-Control-Allow-Methods', 'GET,POST,OPTIONS')
     return response
 
-# GitHub data URLs
-GITHUB_USER = "swaminaathakrishnan"
-REPO_NAME = "Cool_Route_prototype"
-BASE_URL = f"https://raw.githubusercontent.com/{GITHUB_USER}/{REPO_NAME}/master/data/"
-PCN_URL = BASE_URL + "ParkConnectorLoop.geojson"
-TREES_URL = BASE_URL + "trees.csv"
-WATER_URL = BASE_URL + "water.geojson"
-HAWKER_URL = BASE_URL + "HawkerCentresGEOJSON.geojson"
+# Local data paths (files deployed with Cloud Run)
+PCN_URL = "data/ParkConnectorLoop.geojson"
+TREES_URL = "data/trees_downloaded.csv"
+WATER_URL = "data/water.geojson"
+HAWKER_URL = "data/HawkerCentresGEOJSON.geojson"
 
 # Thermal weights from v5.3
 WEIGHT_PCN = 0.5
