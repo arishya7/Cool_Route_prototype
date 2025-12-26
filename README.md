@@ -196,59 +196,11 @@ git commit -m "Add Sentosa cached network"
 git push
 ```
 
-### Adjust Route Weights
-Edit `simple_server.py`:
-```python
-WEIGHT_TREE_SHADE = 0.6      # Lower = prioritize tree shade more
-WEIGHT_WATER = 0.55          # Lower = prioritize water proximity
-WEIGHT_BUILDING_SHADE = 0.7  # Lower = prioritize building shade
-```
 
----
 
-## 📈 Future Enhancements
-
-- [ ] Add real-time traffic data integration
-- [ ] Elevation-aware routing (avoid steep hills in heat)
-- [ ] User route preferences (more shade vs. shorter distance)
-- [ ] Historical heat pattern analysis
-- [ ] Community-contributed cooling spots
-- [ ] iOS/Android native apps
-- [ ] Integration with fitness trackers
-
----
-
-## 👥 Team
-
-**Arishya Jindal**
-- Route optimization algorithms
-- Spatial data processing
-- Cloud deployment
-
-**Swaminaatha Krishnan**
-- System architecture
-- Weather forecasting model
-- Frontend design
-
----
 
 ## 📄 License
 
 MIT License - Free for personal and commercial use
 
----
 
-## 🙏 Acknowledgments
-
-- National Environment Agency (NEA) for weather data access
-- OpenStreetMap contributors for road network data
-- NParks for tree inventory data
-- Google Cloud and Render for hosting infrastructure
-
----
-
-## 📧 Contact
-
-Issues and suggestions: [GitHub Issues](https://github.com/arishya7/Cool_Route_prototype/issues)
-
-Live Demo: [https://coolride-frontend.onrender.com](https://coolride-frontend.onrender.com)
