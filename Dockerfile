@@ -15,13 +15,16 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy application code
+# Copy application code (LFS pointer files will be replaced)
 COPY . .
 
-# Verify trees data file is present and not a pointer
-RUN echo "Verifying trees data file in Docker image..." && \
+# Download trees data from Google Cloud Storage (replaces LFS pointer)
+RUN apt-get update && apt-get install -y wget && \
+    echo "Downloading trees data from GCS..." && \
+    wget -O data/trees_downloaded.csv "https://storage.googleapis.com/gen-lang-client-0096113115-coolride-data/trees_downloaded.csv" && \
+    echo "Trees data downloaded successfully!" && \
     ls -lh data/trees_downloaded.csv && \
-    head -n 2 data/trees_downloaded.csv || echo "Warning: Trees file not found or invalid"
+    head -n 2 data/trees_downloaded.csv
 
 # Set environment variables
 ENV PORT=8080

@@ -1,22 +1,5 @@
 steps:
-  # Install and configure Git LFS, then pull the actual files
-  - name: 'debian'
-    entrypoint: 'bash'
-    args:
-      - '-c'
-      - |
-        cd /workspace
-        apt-get update && apt-get install -y git-lfs
-        git lfs install
-        git lfs pull
-        echo "=== Verifying trees data file after LFS pull ==="
-        ls -lh data/trees_downloaded.csv
-        echo "=== First 2 lines of trees file ==="
-        head -n 2 data/trees_downloaded.csv
-        echo "=== File type check ==="
-        file data/trees_downloaded.csv
-
-  # Build the container image (now with actual LFS files in /workspace)
+  # Build the container image (trees data will be downloaded from GCS during build)
   - name: 'gcr.io/cloud-builders/docker'
     args: ['build', '-t', 'gcr.io/$PROJECT_ID/coolride-api', '.']
 
