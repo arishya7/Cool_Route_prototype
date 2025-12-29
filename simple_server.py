@@ -352,8 +352,8 @@ def calculate_route_v53(start_lat, start_lon, end_lat, end_lon, departure_time):
     trees_buffer = None
     try:
         # Check if trees CSV exists
-        if os.path.exists('trees_downloaded.csv'):
-            trees_df = pd.read_csv('trees_downloaded.csv')
+        if os.path.exists(TREES_URL):
+            trees_df = pd.read_csv(TREES_URL)
             # Filter to bounding box
             trees_df = trees_df[(trees_df['lat'] >= miny) & (trees_df['lat'] <= maxy) &
                                (trees_df['lng'] >= minx) & (trees_df['lng'] <= maxx)]
