@@ -19,12 +19,14 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Download trees data from Google Cloud Storage (replaces LFS pointer)
+# Skip if file doesn't exist - trees are optional
 RUN apt-get update && apt-get install -y wget && \
     echo "Downloading trees data from GCS..." && \
-    wget -O data/trees_downloaded.csv "https://storage.googleapis.com/gen-lang-client-0096113115-coolride-data/trees_downloaded.csv" && \
-    echo "Trees data downloaded successfully!" && \
-    ls -lh data/trees_downloaded.csv && \
-    head -n 2 data/trees_downloaded.csv
+    (wget -O data/trees_downloaded.csv "https://storage.googleapis.com/gen-lang-client-0096113115-coolride-data/trees_downloaded.csv" && \
+     echo "✅ Trees data downloaded successfully!" && \
+     ls -lh data/trees_downloaded.csv && \
+     head -n 2 data/trees_downloaded.csv) || \
+    echo "⚠️ Trees data not available - skipping (app will work without tree shading)"
 
 # Set environment variables
 ENV PORT=8080
