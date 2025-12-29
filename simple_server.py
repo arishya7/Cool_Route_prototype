@@ -587,6 +587,36 @@ def calculate_route_v53(start_lat, start_lon, end_lat, end_lon, departure_time):
         print(f"   ❌ Routing failed: {e}")
         return None, None, None, [], 0, 0
 
+@app.route('/debug/files', methods=['GET'])
+def debug_files():
+    """Debug endpoint to check what files exist in the container"""
+    import os
+    debug_info = {
+        "trees_file_exists": os.path.exists(TREES_URL),
+        "trees_file_size": os.path.getsize(TREES_URL) if os.path.exists(TREES_URL) else 0,
+        "data_dir_contents": os.listdir('data/') if os.path.exists('data/') else [],
+    }
+
+    # Read first few lines of trees file
+    if os.path.exists(TREES_URL):
+        try:
+            with open(TREES_URL, 'r') as f:
+                debug_info["trees_first_lines"] = [f.readline().strip() for _ in range(3)]
+        except Exception as e:
+            debug_info["trees_read_error"] = str(e)
+
+    # Try to load as pandas to see columns
+    if os.path.exists(TREES_URL):
+        try:
+            import pandas as pd
+            df = pd.read_csv(TREES_URL, nrows=1)
+            debug_info["trees_columns"] = list(df.columns)
+            debug_info["trees_row_count"] = len(pd.read_csv(TREES_URL))
+        except Exception as e:
+            debug_info["trees_pandas_error"] = str(e)
+
+    return jsonify(debug_info)
+
 @app.route('/calculate_route', methods=['POST', 'OPTIONS'])
 def calculate_route():
     if request.method == 'OPTIONS':
