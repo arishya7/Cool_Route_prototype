@@ -479,19 +479,40 @@ def calculate_route_v53(start_lat, start_lon, end_lat, end_lon, departure_time):
                     lat, lon = row.geometry.centroid.y, row.geometry.centroid.x
                 amenities_list.append((name, lat, lon, "Supermarket"))
 
-        # C. Load MRT stations from OSM
-        mrt_tags = {'railway': 'station', 'station': 'subway'}
-        mrt_pois = ox.features_from_point((start_lat, start_lon), tags=mrt_tags, dist=2000)
-        if not mrt_pois.empty:
-            for idx, row in mrt_pois.iterrows():
+        # C. Load MRT stations from local file
+        try:
+            mrt_gdf = gpd.read_file('data/mrt_stations.geojson')
+            if mrt_gdf.crs != "EPSG:4326":
+                mrt_gdf = mrt_gdf.to_crs("EPSG:4326")
+            mrt_gdf = mrt_gdf.cx[minx:maxx, miny:maxy]
+
+            for idx, row in mrt_gdf.iterrows():
                 name = row.get('name', 'Unknown')
                 if name == 'Unknown':
                     continue
-                if row.geometry.geom_type == 'Point':
-                    lat, lon = row.geometry.y, row.geometry.x
-                else:
-                    lat, lon = row.geometry.centroid.y, row.geometry.centroid.x
+                lat, lon = row.geometry.y, row.geometry.x
                 amenities_list.append((name, lat, lon, "MRT"))
+            print(f"   ✅ Loaded {len(mrt_gdf)} MRT stations")
+        except Exception as e:
+            print(f"   ⚠️ MRT Error: {e}")
+
+        # D. Load famous landmarks from local file
+        try:
+            landmarks_gdf = gpd.read_file('data/landmarks.geojson')
+            if landmarks_gdf.crs != "EPSG:4326":
+                landmarks_gdf = landmarks_gdf.to_crs("EPSG:4326")
+            landmarks_gdf = landmarks_gdf.cx[minx:maxx, miny:maxy]
+
+            for idx, row in landmarks_gdf.iterrows():
+                name = row.get('name', 'Unknown')
+                if name == 'Unknown':
+                    continue
+                lat, lon = row.geometry.y, row.geometry.x
+                landmark_type = row.get('type', 'Landmark')
+                amenities_list.append((name, lat, lon, landmark_type))
+            print(f"   ✅ Loaded {len(landmarks_gdf)} landmarks")
+        except Exception as e:
+            print(f"   ⚠️ Landmarks Error: {e}")
 
         print(f"   ✅ Total points of interest: {len(amenities_list)}")
     except Exception as e:
