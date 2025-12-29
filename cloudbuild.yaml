@@ -1,4 +1,8 @@
 steps:
+  # Pull Git LFS files (for trees data)
+  - name: 'gcr.io/cloud-builders/git'
+    args: ['lfs', 'pull']
+
   # Build the container image
   - name: 'gcr.io/cloud-builders/docker'
     args: ['build', '-t', 'gcr.io/$PROJECT_ID/coolride-api', '.']
