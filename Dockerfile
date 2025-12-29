@@ -18,6 +18,11 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy application code
 COPY . .
 
+# Verify trees data file is present and not a pointer
+RUN echo "Verifying trees data file in Docker image..." && \
+    ls -lh data/trees_downloaded.csv && \
+    head -n 2 data/trees_downloaded.csv || echo "Warning: Trees file not found or invalid"
+
 # Set environment variables
 ENV PORT=8080
 ENV PYTHONUNBUFFERED=1

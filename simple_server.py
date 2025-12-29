@@ -354,9 +354,18 @@ def calculate_route_v53(start_lat, start_lon, end_lat, end_lon, departure_time):
         # Check if trees CSV exists
         if os.path.exists(TREES_URL):
             trees_df = pd.read_csv(TREES_URL)
-            # Filter to bounding box
-            trees_df = trees_df[(trees_df['lat'] >= miny) & (trees_df['lat'] <= maxy) &
-                               (trees_df['lng'] >= minx) & (trees_df['lng'] <= maxx)]
+
+            # Verify columns exist
+            if 'lat' not in trees_df.columns or 'lng' not in trees_df.columns:
+                print(f"   ⚠️ Tree CSV missing columns. Found: {list(trees_df.columns)}")
+                print(f"   ⚠️ File size: {os.path.getsize(TREES_URL)} bytes - may be LFS pointer file")
+                trees_df = pd.DataFrame()  # Empty DataFrame to skip processing
+
+            # Filter to bounding box only if we have valid data
+            if not trees_df.empty and 'lat' in trees_df.columns and 'lng' in trees_df.columns:
+                trees_df = trees_df[(trees_df['lat'] >= miny) & (trees_df['lat'] <= maxy) &
+                                   (trees_df['lng'] >= minx) & (trees_df['lng'] <= maxx)]
+
             if not trees_df.empty:
                 # Convert to GeoDataFrame
                 from shapely.geometry import Point
@@ -369,7 +378,7 @@ def calculate_route_v53(start_lat, start_lon, end_lat, end_lon, departure_time):
                 trees_buffer = gpd.GeoSeries([trees_buffer_proj], crs="EPSG:3414").to_crs("EPSG:4326")[0]
                 print(f"   ✅ Tree shade ({len(trees_gdf)} trees)")
             else:
-                print("   ⚠️ No trees in this area")
+                print("   ⚠️ No trees in this area or invalid tree data")
         elif os.path.exists('data/Trees_SG.geojson'):
             trees_gdf = gpd.read_file('data/Trees_SG.geojson')
             trees_gdf = trees_gdf.cx[minx:maxx, miny:maxy]
@@ -382,6 +391,8 @@ def calculate_route_v53(start_lat, start_lon, end_lat, end_lon, departure_time):
             print("   ⚠️ Tree data missing (skipping)")
     except Exception as e:
         print(f"   ⚠️ Tree Error: {e}")
+        import traceback
+        print(f"   ⚠️ Tree Error Details: {traceback.format_exc()}")
 
     # 4. LOAD BUILDINGS
     print("⏳ Loading Buildings...")

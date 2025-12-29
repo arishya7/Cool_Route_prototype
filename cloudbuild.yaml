@@ -3,6 +3,17 @@ steps:
   - name: 'gcr.io/cloud-builders/git'
     args: ['lfs', 'pull']
 
+  # Verify trees file was pulled correctly
+  - name: 'gcr.io/cloud-builders/git'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        echo "Verifying trees data file..."
+        ls -lh data/trees_downloaded.csv
+        file data/trees_downloaded.csv
+        head -n 2 data/trees_downloaded.csv
+
   # Build the container image
   - name: 'gcr.io/cloud-builders/docker'
     args: ['build', '-t', 'gcr.io/$PROJECT_ID/coolride-api', '.']
